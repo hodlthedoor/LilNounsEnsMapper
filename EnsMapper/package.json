@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@ensdomains/ens-contracts": "^0.0.12",
+    "@openzeppelin/contracts": "^4.7.1"
+  }
+}

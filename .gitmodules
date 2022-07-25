@@ -1,0 +1,3 @@
+[submodule "EnsMapper/lib/forge-std"]
+	path = EnsMapper/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
