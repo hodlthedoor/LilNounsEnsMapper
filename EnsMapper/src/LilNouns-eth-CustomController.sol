@@ -28,11 +28,11 @@ contract EnsMapper is Ownable {
 
     IReverseResolver constant public ReverseResolver = IReverseResolver(REVERSE_RESOLVER_ADDRESS);
     ENS constant private ens = ENS(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);    
-    IERC721 constant public nft = IERC721(0x47e9eD80BDC66438b71132bd9DAA2c4d99716b4d);
+    IERC721 constant public nft = IERC721(0x4b10701Bfd7BFEdc47d50562b76b436fbB5BdB3B); //IERC721(0x47e9eD80BDC66438b71132bd9DAA2c4d99716b4d);
     bytes32 constant public domainHash = 0x524060b540a9ca20b59a94f7b32d64ebdbeedc42dfdc7aac115003633593b492;
     mapping(bytes32 => mapping(string => string)) public texts;
    
-    mapping(address => uint256) public nextRegisterTimestamp;
+
 
     string constant public domainLabel = "lilnouns";
 
@@ -40,7 +40,7 @@ contract EnsMapper is Ownable {
     mapping(uint256 => bytes32) public tokenHashmap;
     mapping(bytes32 => string) public hashToDomainMap;
 
-    uint256 public reset_period = 1800; //30 minutes
+    
 
     event TextChanged(bytes32 indexed node, string indexed indexedKey, string key);
     event RegisterSubdomain(address indexed registrar, uint256 indexed token_id, string indexed label);
@@ -61,7 +61,7 @@ contract EnsMapper is Ownable {
 
     function text(bytes32 node, string calldata key) external view returns (string memory) {
         uint256 token_id = hashToIdMap[node];
-        require(token_id > 0 && tokenHashmap[token_id] != 0x0, "Invalid address");
+        require(tokenHashmap[token_id] != 0x0, "Invalid address");
         if(keccak256(abi.encodePacked(key)) == keccak256("avatar")){
 
             return string(abi.encodePacked("eip155:1/erc721:0x4b10701Bfd7BFEdc47d50562b76b436fbB5BdB3B/", token_id.toString()));            
@@ -73,12 +73,12 @@ contract EnsMapper is Ownable {
 
     function addr(bytes32 nodeID) public view returns (address) {
         uint256 token_id = hashToIdMap[nodeID];
-        require(token_id > 0 && tokenHashmap[token_id] != 0x0, "Invalid address");
+        require(tokenHashmap[token_id] != 0x0, "Invalid address");
         return nft.ownerOf(token_id);
     }  
 
     function name(bytes32 node) view public returns (string memory){
-        return (hashToIdMap[node] == 0) 
+        return (hashToDomainMap[node] == 0x0) 
         ? "" 
         : string(abi.encodePacked(hashToDomainMap[node], ".", domainLabel, ".eth"));
     }
@@ -116,7 +116,6 @@ contract EnsMapper is Ownable {
     //<authorised-functions>
     function setDomain(string calldata label, uint256 token_id) public isAuthorised(token_id) {     
         require(tokenHashmap[token_id] == 0x0, "Token has already been set");
-        require(block.timestamp > nextRegisterTimestamp[msg.sender], "Wallet must wait more time to register");
            
         bytes32 encoded_label = keccak256(abi.encodePacked(label));
         bytes32 big_hash = keccak256(abi.encodePacked(domainHash, encoded_label));
@@ -132,10 +131,6 @@ contract EnsMapper is Ownable {
         hashToIdMap[big_hash] = token_id;        
         tokenHashmap[token_id] = big_hash;
         hashToDomainMap[big_hash] = label;
-
-        if (owner() != msg.sender){                 
-            nextRegisterTimestamp[msg.sender] = block.timestamp + reset_period;
-        }
 
         address token_owner = nft.ownerOf(token_id);
 
@@ -157,10 +152,14 @@ contract EnsMapper is Ownable {
     //is transfered then it can't callback to this contract so we provide this
     //method for users to do it manually. Anyone can call this method.
     function updateAddresses(uint256[] calldata _ids) external {
-        for(uint256 i; i < _ids.length; i++){
+        uint256 len = _ids.length;
+        for(uint256 i; i < len;){
             bytes32 big_hash = tokenHashmap[_ids[i]];
             require(big_hash != 0x0, "no subdomain on this token");
             emit AddrChanged(big_hash, nft.ownerOf(_ids[i]));  
+            unchecked{
+                ++i;
+            }
         }
     }
 
@@ -174,14 +173,12 @@ contract EnsMapper is Ownable {
         require(ens.recordExists(domain), "Sub-domain does not exist");
         
         //reset domain mappings
-        hashToDomainMap[domain] = "";      
-        hashToIdMap[domain] = 0;
-        tokenHashmap[token_id] = 0x0;
+        delete hashToDomainMap[domain];      
+        delete hashToIdMap[domain];
+        delete tokenHashmap[token_id];
 
-        if(nextRegisterTimestamp[msg.sender] > block.timestamp && msg.sender != owner()){
-            nextRegisterTimestamp[msg.sender] = block.timestamp + (60 * 30); //30 minute cooldown
-        }
-        
+        emit AddrChanged(domain, address(0));  
+       
     }
     //</authorised-functions>
 
@@ -189,13 +186,6 @@ contract EnsMapper is Ownable {
 
     // <owner-functions>
 
-    function resetAddressForClaim(address addy) public onlyOwner {
-        delete nextRegisterTimestamp[addy];
-    }
-
-    function updateResetPeriod(uint256 time) public onlyOwner {
-        reset_period = time;
-    }
 
     function renounceOwnership() public override onlyOwner {
         require(false, "ENS is responsibility. You cannot renounce ownership.");

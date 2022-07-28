@@ -536,8 +536,8 @@
       }
     },
     "src/LilNouns-eth-CustomController.sol": {
-      "lastModificationDate": 1658417587014,
-      "contentHash": "4f42f4f215774bdd43a6c825be286ccd",
+      "lastModificationDate": 1658932618494,
+      "contentHash": "3524ef1de113f14703e6d99bb43fec63",
       "sourceName": "src/LilNouns-eth-CustomController.sol",
       "solcConfig": {
         "settings": {
@@ -577,6 +577,9 @@
       "artifacts": {
         "EnsMapper": {
           "0.8.15+commit.e14f2714.Linux.gcc": "LilNouns-eth-CustomController.sol/EnsMapper.json"
+        },
+        "IReverseResolver": {
+          "0.8.15+commit.e14f2714.Linux.gcc": "LilNouns-eth-CustomController.sol/IReverseResolver.json"
         }
       }
     },
