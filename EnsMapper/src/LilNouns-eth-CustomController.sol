@@ -28,7 +28,7 @@ contract EnsMapper is Ownable {
 
     IReverseResolver constant public ReverseResolver = IReverseResolver(REVERSE_RESOLVER_ADDRESS);
     ENS constant private ens = ENS(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);    
-    IERC721 constant public nft = IERC721(0x4b10701Bfd7BFEdc47d50562b76b436fbB5BdB3B); //IERC721(0x47e9eD80BDC66438b71132bd9DAA2c4d99716b4d);
+    IERC721 constant public nft = IERC721(0x4b10701Bfd7BFEdc47d50562b76b436fbB5BdB3B);
     bytes32 constant public domainHash = 0x524060b540a9ca20b59a94f7b32d64ebdbeedc42dfdc7aac115003633593b492;
     mapping(bytes32 => mapping(string => string)) public texts;
    
@@ -78,7 +78,7 @@ contract EnsMapper is Ownable {
     }  
 
     function name(bytes32 node) view public returns (string memory){
-        return (hashToDomainMap[node] == 0x0) 
+        return (bytes(hashToDomainMap[node]).length == 0) 
         ? "" 
         : string(abi.encodePacked(hashToDomainMap[node], ".", domainLabel, ".eth"));
     }
@@ -114,15 +114,12 @@ contract EnsMapper is Ownable {
     //--------------------------------------------------------------------------------------------//
 
     //<authorised-functions>
-    function setDomain(string calldata label, uint256 token_id) public isAuthorised(token_id) {     
+    function claimSubdomain(string calldata label, uint256 token_id) public isAuthorised(token_id) {     
         require(tokenHashmap[token_id] == 0x0, "Token has already been set");
            
         bytes32 encoded_label = keccak256(abi.encodePacked(label));
         bytes32 big_hash = keccak256(abi.encodePacked(domainHash, encoded_label));
 
-        //contract owner can update / overwrite records. << this may be changed in the future with an updated method but as this is still 
-        //an experiment we'd like to retain some level of control over the sub-domains
-        //
         //ens.recordExists seems to not be reliable (tested removing records through ENS control panel and this still returns true)
         require(!ens.recordExists(big_hash) || msg.sender == owner(), "sub-domain already exists");
         

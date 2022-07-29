@@ -536,8 +536,8 @@
       }
     },
     "src/LilNouns-eth-CustomController.sol": {
-      "lastModificationDate": 1658932618494,
-      "contentHash": "3524ef1de113f14703e6d99bb43fec63",
+      "lastModificationDate": 1659004296844,
+      "contentHash": "24ce5091eae8cb5a7e64d5ffbcba7e0a",
       "sourceName": "src/LilNouns-eth-CustomController.sol",
       "solcConfig": {
         "settings": {
@@ -584,8 +584,8 @@
       }
     },
     "test/Contract.t.sol": {
-      "lastModificationDate": 1658406937034,
-      "contentHash": "848ba83feec29a2e4d286c118102ae20",
+      "lastModificationDate": 1659096875174,
+      "contentHash": "f5ee18398c15f83151899b00b0aaf67d",
       "sourceName": "test/Contract.t.sol",
       "solcConfig": {
         "settings": {
@@ -619,12 +619,19 @@
         "lib/forge-std/src/Test.sol",
         "lib/forge-std/src/Vm.sol",
         "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol"
+        "lib/forge-std/src/console2.sol",
+        "node_modules/@ensdomains/ens-contracts/contracts/registry/ENS.sol",
+        "node_modules/@openzeppelin/contracts/access/Ownable.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "src/LilNouns-eth-CustomController.sol"
       ],
       "versionRequirement": "^0.8.13",
       "artifacts": {
-        "ContractTest": {
-          "0.8.15+commit.e14f2714.Linux.gcc": "Contract.t.sol/ContractTest.json"
+        "LilNounsCustomControllerTest": {
+          "0.8.15+commit.e14f2714.Linux.gcc": "Contract.t.sol/LilNounsCustomControllerTest.json"
         }
       }
     }
